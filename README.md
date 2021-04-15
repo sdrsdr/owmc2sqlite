@@ -60,9 +60,9 @@ sys     0m10.221s
 Issuing SQL queries like `SELECT * FROM cities WHERE lat BETWEEN -10000 AND 10000 AND lon BETWEEN -10000 and 10000` is practically instantaneous no matter if file is on SSD or RAM
 
 
-###Licenses
+### Licenses
 
 This code is under MIT License as is the portion of RapidJSON used here. SQLite is in public domain so you're free to use this tool anyway you like
 
 
-##ENJOY :)
+## ENJOY :)
