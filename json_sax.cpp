@@ -82,6 +82,20 @@ unsigned lon_hist[36];
 unsigned lat_hist[18];
 #endif
 
+#ifdef FEATURE_WRAP
+	const double wrap_at_lon[9]={
+		0.89932,
+		1.00834,
+		1.15343,
+		1.34998,
+		1.62675,
+		2.04216,
+		2.73325,
+		4.71196,
+		8.83917,
+	};
+#endif
+
 void flush_owm_city(){
 	if ((data_found&complete_data_mask)!=complete_data_mask) {
 		cout<<"...flush_owm_city but data is incomplete ("<<hex<<data_found<<") stored name:"<<city_name<<" stored id:"<<city_id<<endl;
@@ -116,7 +130,7 @@ void flush_owm_city(){
 
 	unsigned lat_hist_i=((unsigned)(city_lat+90))/10;
 	if (lat_hist_i<0 || lat_hist_i>18) {
-		cout<<"lat_hist_i fails at "<<lat_hist_i<<" with lon:"<<city_lat<<" for id:"<<city_id<<endl;
+		cout<<"lat_hist_i fails at "<<lat_hist_i<<" with lat:"<<city_lat<<" for id:"<<city_id<<endl;
 	} else {
 		lat_hist[lat_hist_i]++;
 	}
@@ -124,6 +138,21 @@ void flush_owm_city(){
 
 	sqlite_be_store(city_id,city_name,city_state, city_country, city_lat*1000,city_lon*1000);
 
+#ifdef FEATURE_WRAP
+	if (abs(city_lon)>170) {
+		int lat_i=abs(city_lat)/10;
+		double deg2am=180-abs(city_lon);
+		double wrap_lon;
+
+		if (city_lon>0) wrap_lon=city_lon-360;
+		else  wrap_lon=360+city_lon;
+
+		if (deg2am<=wrap_at_lon[lat_i]) {
+			//cout<<"Wrap lon:"<<setw(9)<<city_lon<<"("<<setw(9)<<wrap_lon<<") lat:"<<setw(9)<<city_lat<<" lat_i:"<<lat_i<<" deg2am:"<<setw(8)<<deg2am<<" th:"<<wrap_at_lon[lat_i]<<" city:"<<city_name<<" id:"<<city_id<<endl;
+			sqlite_be_store(city_id,city_name,city_state, city_country, city_lat*1000,wrap_lon*1000);
+		}
+	}
+#endif
 /* TODO:
 test.m 
 ----------------

@@ -59,6 +59,9 @@ sys     0m10.221s
 ```
 Issuing SQL queries like `SELECT * FROM cities WHERE lat BETWEEN -10000 AND 10000 AND lon BETWEEN -10000 and 10000` is practically instantaneous no matter if file is on SSD or RAM
 
+### Cities wrapping around anti meridian
+
+Searching for cities near given point is somewhat complicated near the anti meridian (+ or - 180 longitude) to ease the pain cities within 100km to AM will be wrapped around and duplicated: if the city has lon 179.9 will be duplicated with lon -180.1 which is mathematically the same but can be selected with `-179.5<lon<-180.5` if searching around point with negative lon. This can be switched off buy editing the Makefile and recompiling the tool
 
 ###Licenses
 

@@ -5,6 +5,11 @@
 
 deftarget:build/owmc2sqlite
 
+#COMPILE_FEATURES += -g -Og #emable debug
+COMPILE_FEATURES += -O3 #Optimize for speed
+
+#CODE_FEATURES += -DFEATURE_HIST
+CODE_FEATURES += -DFEATURE_WRAP
 
 ifndef SQLITE3_LIBS
 ifeq (,$(wildcard ./sqlite3.make))
@@ -42,12 +47,12 @@ $(shell ln -s $(XDG_RUNTIME_DIR)/owmc2sqlite_build build)
 endif
 endif
 
+$(info CODE_FEATURES=${CODE_FEATURES} COMPILE_FEATURES=${COMPILE_FEATURES} )
 $(info SQLITE3_LIBS=${SQLITE3_LIBS} SQLITE3_CFLAGS=${SQLITE3_CFLAGS} RAPIDJSON_CFLAGS=${RAPIDJSON_CFLAGS} )
 
 
-#CFLAGS=-Wall -g -Og ${SQLITE3_CFLAGS} ${RAPIDJSON_CFLAGS}
-CFLAGS=-Wall -O3 ${SQLITE3_CFLAGS} ${RAPIDJSON_CFLAGS}
-CXXFLAGS=-std=c++17
+
+CFLAGS=${COMPILE_FEATURES} ${CODE_FEATURES} ${SQLITE3_CFLAGS} ${RAPIDJSON_CFLAGS}
 
 .ONESHELL:
 .PHONY: clean distclean 
@@ -55,7 +60,7 @@ CXXFLAGS=-std=c++17
 
 build/%.o: %.cpp
 	@echo [CPPC $<]
-	g++ -c -o $@ $(realpath $<) ${CFLAGS} ${CXXFLAGS} -MMD -MP -MF ${@:.o=.d}
+	g++ -c -o $@ $(realpath $<) ${CFLAGS} -std=c++17 -Wall -MMD -MP -MF ${@:.o=.d}
 
 LINK=g++ -o $@ $^ ${SQLITE3_LIBS}
 

@@ -17,6 +17,9 @@ using namespace std;
 
 static const size_t fstrm_buffer_sz=1024*40;
 int main(int argc, char *argv[]){
+#ifdef FEATURE_WRAP
+	cout<<"This tool will duplicete some cities near the anti meridian to groom the resulting data set for easy range selections around it"<<endl;
+#endif
 	if (argc!=3) {
 		cout<<"Params count is "<<argc<<" but we expect it to be 3"<<endl;
 		return 1;
