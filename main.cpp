@@ -20,6 +20,9 @@ int main(int argc, char *argv[]){
 #ifdef FEATURE_WRAP
 	cout<<"This tool will duplicete some cities near the anti meridian to groom the resulting data set for easy range selections around it"<<endl;
 #endif
+#ifdef FEATURE_DEDUP
+	cout<<"This tool will detect cities with same location and will generate single row for all colliding records; All cities get new id calculated from lat/lon"<<endl;
+#endif
 	if (argc!=3) {
 		cout<<"Params count is "<<argc<<" but we expect it to be 3"<<endl;
 		return 1;

@@ -63,6 +63,10 @@ Issuing SQL queries like `SELECT * FROM cities WHERE lat BETWEEN -10000 AND 1000
 
 Searching for cities near given point is somewhat complicated near the anti meridian (+ or - 180 longitude) to ease the pain cities within 100km to AM will be wrapped around and duplicated: if the city has lon 179.9 will be duplicated with lon -180.1 which is mathematically the same but can be selected with `-179.5<lon<-180.5` if searching around point with negative lon. This can be switched off buy editing the Makefile and recompiling the tool
 
+### Dedup cities at same coordinates
+
+Data in some regions contain cities with different ids but with often the same name. To remove duplicates this tool, in its default config will ignore original id and assign new ones that relate to lat/lon (see sqlite_be.cpp func latlon2id) and then this id collide in DB `altname` column is appended. This can be switched off buy editing the Makefile and recompiling the tool
+
 ### Licenses
 
 This code is under MIT License as is the portion of RapidJSON used here. SQLite is in public domain so you're free to use this tool anyway you like

@@ -10,6 +10,8 @@ COMPILE_FEATURES += -O3 #Optimize for speed
 
 #CODE_FEATURES += -DFEATURE_HIST
 CODE_FEATURES += -DFEATURE_WRAP
+CODE_FEATURES += -DFEATURE_DEDUP
+
 
 ifndef SQLITE3_LIBS
 ifeq (,$(wildcard ./sqlite3.make))

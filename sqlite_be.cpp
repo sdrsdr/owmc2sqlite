@@ -17,7 +17,36 @@ namespace SQLITE_BE {
 }
 
 using namespace SQLITE_BE;
+#ifdef FEATURE_DEDUP
+	static inline int64_t latlon2id(int lat, int lon) {
+		//result has  digital structure SNNNNNNTTTTT
+		//where S is lat,lon signs encoded, NNNNNN is lon digits TTTTT is lat digits 
+		//S is one of 1,2,3,4  
+		//       100000 lon shifter so lat can fit in lower part
+		//max lat=90000 (5dig)
+		//max lon=180000 (6dig)
+		//       100000000000 sign shhifter so lat/lon can fit below
+		//max id=418000090000
+		//log2(418000090000)=38.605 id easily fits in 64bit
+		if (lat>0) {
+			if (lon>0) {
+				return 100000000000+((int64_t)lon*100000)+lat;
+			} else {
+				//lon=-lon;
+				return 200000000000+((int64_t)lon*-100000)+lat;
+			}
+		} else {
+			//lat=-lat;
+			if (lon>0) {
+				return 300000000000+((int64_t)lon*100000)+(-lat);
+			} else {
+				//lon=-lon;
+				return 400000000000+((int64_t)lon*-100000)+(-lat);
+			}
+		}
 
+	}
+#endif
 /*
 [
     {
@@ -53,13 +82,24 @@ int sqlite_be_init(const char *dbname) {
 	if (sqlite3_prepare_v2(
 		db,
 		"CREATE TABLE cities ( "
-			"id NUMBER, "
-			"name TEXT,"
+			"id NUMBER "
+#ifdef FEATURE_DEDUP
+				" PRIMARY KEY"
+#endif			
+			", name TEXT,"
+
+#ifdef FEATURE_DEDUP
+			"altname TEXT DEFAULT '',"
+#endif			
 			"state TEXT, "
 			"country TEXT, "
 			"lat INTEGER, "
 			"lon INTEGER "
-		")",
+		") "
+#ifdef FEATURE_DEDUP
+		" WITHOUT ROWID"
+#endif		
+		,
 		-1,
 		&stmt,
 		NULL
@@ -93,7 +133,15 @@ int sqlite_be_init(const char *dbname) {
 	if (sqlite3_prepare_v2(
 		db, //                1  2     3     4      5   6
 		"INSERT INTO cities (id,name,state,country,lat,lon) "
-		"VALUES             ( ?,  ? ,  ?  ,   ?   , ? , ? )",
+		"VALUES             (?1, ?2 ,  ?3 ,  ?4   , ?5, ?6 ) "
+#ifdef FEATURE_DEDUP
+		"ON CONFLICT (id) DO UPDATE SET altname=CASE "
+		"  WHEN cities.name=?2 THEN cities.altname "
+		"  WHEN cities.altname='' THEN ?2 "
+		"  ELSE ?2 || ';' || cities.altname "
+		"END "
+#endif
+		,
 		-1,
 		&insst,
 		NULL
@@ -158,6 +206,9 @@ int sqlite_be_fin(void) {
 }
 
 void sqlite_be_store(int64_t id, const char *city, const char* state, const char* country, int lat, int lon) {
+#ifdef FEATURE_DEDUP
+	id=latlon2id(lat,lon);
+#endif	
 	sqlite3_bind_int64(insst,1,id);
 	sqlite3_bind_text(insst,2,city,-1, SQLITE_STATIC);
 	sqlite3_bind_text(insst,3,state,-1, SQLITE_STATIC);
