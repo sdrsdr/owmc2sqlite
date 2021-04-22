@@ -65,7 +65,7 @@ Searching for cities near given point is somewhat complicated near the anti meri
 
 ### Dedup cities at same coordinates
 
-Data in some regions contain cities with different ids but with often the same name. To remove duplicates this tool, in its default config will ignore original id and assign new ones that relate to lat/lon (see sqlite_be.cpp func latlon2id) and then this id collide in DB `altname` column is appended. This can be switched off buy editing the Makefile and recompiling the tool
+Data in some regions contain cities with same lat,lon with different ids but with often the same name. To remove duplicates this tool, in its default config will ignore original id and assign new ones that relate to lat/lon (see sqlite_be.cpp func latlon2id) and when this id collide in DB `altname` column is appended. This can be switched off buy editing the Makefile and recompiling the tool
 
 ### Licenses
 
