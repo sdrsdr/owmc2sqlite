@@ -83,7 +83,7 @@ unsigned lat_hist[18];
 #endif
 
 #ifdef FEATURE_WRAP
-	const double wrap_at_lon[9]={
+	const double wrap_lon_at_lat[9]={
 		0.89932,
 		1.00834,
 		1.15343,
@@ -147,7 +147,7 @@ void flush_owm_city(){
 		if (city_lon>0) wrap_lon=city_lon-360;
 		else  wrap_lon=360+city_lon;
 
-		if (deg2am<=wrap_at_lon[lat_i]) {
+		if (deg2am<=wrap_lon_at_lat[lat_i]) {
 			//cout<<"Wrap lon:"<<setw(9)<<city_lon<<"("<<setw(9)<<wrap_lon<<") lat:"<<setw(9)<<city_lat<<" lat_i:"<<lat_i<<" deg2am:"<<setw(8)<<deg2am<<" th:"<<wrap_at_lon[lat_i]<<" city:"<<city_name<<" id:"<<city_id<<endl;
 			sqlite_be_store(city_id,city_name,city_state, city_country, city_lat*1000,wrap_lon*1000);
 		}
